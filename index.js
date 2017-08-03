@@ -1,0 +1,1 @@
+module.exports = require(process.platform === 'win32' ? './win.js' : './lin.js');
