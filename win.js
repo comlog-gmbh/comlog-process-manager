@@ -6,7 +6,8 @@ var exec = require('child_process').exec,
 		'ProcessId': 'pid',
 		'ExecutablePath': 'path',
 		'VirtualSize': 'memory'
-	};
+	},
+	whereAccept = ['Caption','CommandLine','CreationClassName','CreationDate','CSCreationClassName','CSName','Description','ExecutablePath','ExecutionState','Handle','HandleCount','InstallDate','KernelModeTime','MaximumWorkingSetSize','MinimumWorkingSetSize','Name','OSCreationClassName','OSName','OtherOperationCount','OtherTransferCount','PageFaults','PageFileUsage','ParentProcessId','PeakPageFileUsage','PeakVirtualSize','PeakWorkingSetSize','Priority','PrivatePageCount','ProcessId','QuotaNonPagedPoolUsage','QuotaPagedPoolUsage','QuotaPeakNonPagedPoolUsage','QuotaPeakPagedPoolUsage','ReadOperationCount','ReadTransferCount','SessionId','Status','TerminationDate','ThreadCount','UserModeTime','VirtualSize','WindowsVersion','WorkingSetSize','WriteOperationCount','WriteTransferCount'];
 
 function parseTable(data) {
 	var result = [];
@@ -46,24 +47,30 @@ function WinProcManager() {
 			opt = null;
 		}
 		if (!opt) opt = {};
-
 		var filter = [], i, field;
 		for(i in opt) {
 			field = i;
+			// Filter mapping
 			for(var j in map) if (i == map[j]) {
 				field = j;
 				break;
 			}
 
-			if (opt[i].indexOf('contains:') === 0) {
+			// Validate filter
+			if (whereAccept.indexOf(field) == -1) continue;
+
+			if (typeof opt[i] == 'string' && opt[i].indexOf('contains:') === 0) {
 				opt[i] = '%'+opt[i].substr(9)+'%';
 			}
 			filter.push(field + " LIKE '" + opt[i] + "'");
 		}
 
-		var where = filter.length > 0 ?  ' WHERE "'+(filter.join(" AND "))+'"' : '';
+		var
+			where = filter.length > 0 ?  ' WHERE "'+(filter.join(" AND "))+'"' : '',
+			query = 'WMIC path win32_process '+where+' get /all /format:list';
 
-		exec('WMIC path win32_process '+where+' get /all /format:list', function (err, result) {
+		//console.info(query);
+		exec(query, function (err, result) {
 			cb(err, parseTable(result));
 		});
 	}
