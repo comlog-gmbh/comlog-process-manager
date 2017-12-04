@@ -62,7 +62,7 @@ function WinProcManager() {
 			if (typeof opt[i] == 'string' && opt[i].indexOf('contains:') === 0) {
 				opt[i] = '%'+opt[i].substr(9)+'%';
 			}
-			filter.push(field + " LIKE '" + opt[i] + "'");
+			filter.push(field + " LIKE '" + opt[i].replace(/[,]/, '_') + "'");
 		}
 
 		var
