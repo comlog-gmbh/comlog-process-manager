@@ -1,6 +1,6 @@
 {
   "name": "comlog-process-manager",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "System process manager",
   "main": "index.js",
   "scripts": {
